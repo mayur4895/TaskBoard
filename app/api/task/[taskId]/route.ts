@@ -35,12 +35,12 @@ export async function PATCH(req: Request, { params: { taskId } }: { params: { ta
       if(!userId){
         return   NextResponse.json("Unauthorized",{status:500});
       }
-      const {title,desc,due_date} = await req.json();
+      const {title,desc,assignto,priority,status} = await req.json();
 
-      if(!title || !desc || !due_date){
-          NextResponse.json("all fields are required",{status:500});
-      }
-      console.log(title);
+      if(!title || !desc  || !assignto || !priority || !status){
+        NextResponse.json("all fields are required",{status:500});
+    }
+       
       
      
       const updatedTasks  = await db.task.update({
@@ -48,8 +48,10 @@ export async function PATCH(req: Request, { params: { taskId } }: { params: { ta
           id: taskId
          },data:{
           title,
-          desc,
-          due_date,
+          desc, 
+          assignto,
+          priority,
+          status,
           userId 
          }
       })

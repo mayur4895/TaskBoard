@@ -4,12 +4,13 @@ import { create } from "zustand";
 export type ModalType = "createTask"  | "editTask" | "deleteTask"  ;
 interface ModalData {
  
-  id?: string,
-  userId?: string,
-  title?: string,
-  desc?:string,
-  due_date?: string, 
- iscompleted?: boolean,
+  id?: string;
+  userId?: string;
+  title?: string;
+  desc?:string;
+  assignto?: string;
+  priority?:string;
+ status?:string;
 }
 
 interface ModalStore {

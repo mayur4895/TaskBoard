@@ -13,16 +13,17 @@ export async function POST(req:Request){
           return   NextResponse.json("Unauthorized",{status:500});
         }
 
-        const {title,desc,due_date} = await req.json();
+        const {title,desc,assignto,priority} = await req.json();
 
-        if(!title || !desc || !due_date){
+        if(!title || !desc  || !assignto || !priority ){
             NextResponse.json("all fields are required",{status:500});
         }
         const task  = await db.task.create({
            data:{
-            title ,
-            desc ,
-            due_date,
+            title,
+            desc,
+            assignto,
+            priority,
             userId
            
            }

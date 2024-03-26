@@ -36,6 +36,8 @@ import {  CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useModal } from "@/hooks/use-modal-store"
 import { Calendar } from "../ui/calendar"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+import { Textarea } from "../ui/textarea"
  
  
 
@@ -46,15 +48,22 @@ const formSchema = z.object({
     }).max(20,{
         message:"max is 20"
     }),
-
-    desc:z.string().min(1,{
+    desc: z
+    .string()
+    .min(10, {
+      message: "Description must be at least 10 characters.",
+    })
+    .max(160, {
+      message: "Description must not be longer than 30 characters.",
+    }),
+ 
+      assignto:z.string().min(1,{
         message:"required"
-      }).max(100,{
-          message:"max is 20"
       }),
-      due_date: z.date({
-        required_error: "due date is required.",
-      }),
+      
+      priority: z.string({ required_error: "Give at least one" }),
+      status: z.string({ required_error: "Give at least one" }),
+      
 })
 const InitialModal = ()=>{
  const { isOpen,type ,onOpen ,onClose} = useModal();
@@ -65,6 +74,9 @@ const InitialModal = ()=>{
     defaultValues: {
         desc:"",
         title:"",
+        priority:"",
+        status:"",
+        assignto:""
     
     },
   })
@@ -73,14 +85,10 @@ const InitialModal = ()=>{
    async function onSubmit(values: z.infer<typeof formSchema>) {
       
    try {
- 
-    const data = {
-      title:values.title,
-      desc:values.desc,
-      due_date:values.due_date.toDateString()
-    }
+  console.log(values);
+  
     
-   await axios.post("/api/task",data );
+   await axios.post("/api/task",values );
      form.reset();
      router.refresh();
      window.location.reload();
@@ -125,53 +133,51 @@ const InitialModal = ()=>{
                     <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                        <Input placeholder="Enter Description" {...field} />
+                    <Textarea
+                  placeholder="Task Description"
+                  className="resize-none"
+                  {...field}
+                />
                     </FormControl> 
                     </FormItem>
                 )}
                 />
-     <FormField
+
+<FormField
+                control={form.control}
+                name="assignto"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>AssignTo</FormLabel>
+                    <FormControl>
+                        <Input   placeholder="Enter Name" {...field} />
+                    </FormControl> 
+                    </FormItem>
+                )}
+                />
+<FormField
           control={form.control}
-          name="due_date"
+          name="priority"
           render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Date of birth</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[240px] pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0 " align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date:any) =>
-                      date < new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover> 
+            <FormItem>
+              <FormLabel>Priority</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a Priority" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="p0">p0</SelectItem>
+                  <SelectItem value="p1">p1</SelectItem>
+                  <SelectItem value="p2">p2</SelectItem>
+                </SelectContent>
+              </Select> 
               <FormMessage />
             </FormItem>
           )}
         />
- 
+       
         <Button type="submit">{isloding ? "Creating":"Create new"}</Button>
       </form>
     </Form>

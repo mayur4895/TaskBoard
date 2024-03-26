@@ -8,14 +8,31 @@ generator client {
 }
 
  
+enum Priorities {
+p0
+p1
+p2
+}
+
+
+enum Status {
+  pending
+  completed
+  inprogress
+  deployed
+  deffered
+
+}
+ 
 model Task {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   title     String
   desc      String   @db.String
-  due_date  String
-  isCompleted   Boolean @default(false)
-  userId    String   
- 
+  endDate   DateTime ?
+  assignto String
+  status    Status @default(pending)
+  priority  Priorities @default(p0)
+  userId    String    
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt  
 }
